@@ -153,20 +153,20 @@ export default function UsersTable() {
                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{u.email}</p>
                 </td>
                 <td className="px-8 py-5">
-                   <div className="relative inline-block">
-                     <select 
-                       value={u.role}
-                       onChange={(e) => handleRoleChange(u._id, e.target.value)}
-                       className="appearance-none bg-slate-50 border border-slate-200 px-4 py-2 pr-8 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-100 hover:border-indigo-200 transition-all cursor-pointer shadow-sm"
-                     >
-                       <option value="admin">Admin</option>
-                       <option value="analyst">Analyst</option>
-                       <option value="viewer">Viewer</option>
-                     </select>
-                     <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6-9 12 15 18 9"></polyline></svg>
-                     </div>
-                   </div>
+                    <div className="relative inline-block w-full max-w-[120px]">
+                      <select 
+                        value={u.role}
+                        onChange={(e) => handleRoleChange(u._id, e.target.value)}
+                        className="appearance-none w-full bg-slate-50/50 border border-slate-100 px-4 py-2.5 pr-10 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-100 hover:border-slate-200 transition-all cursor-pointer shadow-sm text-center"
+                      >
+                        <option value="admin">Admin</option>
+                        <option value="analyst">Analyst</option>
+                        <option value="viewer">Viewer</option>
+                      </select>
+                      <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                         <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                      </div>
+                    </div>
                 </td>
                 <td className="px-8 py-5 text-right">
                     <button 
