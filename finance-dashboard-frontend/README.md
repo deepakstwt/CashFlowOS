@@ -1,5 +1,5 @@
 # Zorvyn: Financial Dashboard Frontend
-[🏠 Back to Main Overview](file:///Users/deepakprajapati/Desktop/ZorvynAssignment/README.md)
+[🏠 Back to Main Overview](../README.md)
 
 
 [![Next.js](https://img.shields.io/badge/Framework-Next.js%2015-black)](#)

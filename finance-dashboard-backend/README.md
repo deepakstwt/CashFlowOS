@@ -1,5 +1,5 @@
 # Zorvyn: Financial Processing System Backend
-[🏠 Back to Main Overview](file:///Users/deepakprajapati/Desktop/ZorvynAssignment/README.md)
+[🏠 Back to Main Overview](../README.md)
 
 
 [![NestJS](https://img.shields.io/badge/Framework-NestJS-red)](#)

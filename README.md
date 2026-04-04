@@ -12,8 +12,8 @@ A high-fidelity, enterprise-grade financial dashboard designed for real-time tra
 
 ### 📖 Detailed Documentation
 For in-depth technical details, please refer to the specific module documentation:
-- 🔗 **[Backend System Documentation](file:///Users/deepakprajapati/Desktop/ZorvynAssignment/finance-dashboard-backend/README.md)**
-- 🔗 **[Frontend Application Documentation](file:///Users/deepakprajapati/Desktop/ZorvynAssignment/finance-dashboard-frontend/README.md)**
+- 🔗 **[Backend System Documentation](./finance-dashboard-backend/README.md)**
+- 🔗 **[Frontend Application Documentation](./finance-dashboard-frontend/README.md)**
 
 ### 1. Backend Setup
 1. Navigate to the backend directory:
