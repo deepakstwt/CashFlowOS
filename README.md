@@ -3,8 +3,23 @@
 [![Aesthetics](https://img.shields.io/badge/Aesthetics-Premium-blueviolet)](#)
 [![Stack](https://img.shields.io/badge/Stack-Next.js%20|%20NestJS%20|%20MongoDB-blue)](#)
 [![Documentation](https://img.shields.io/badge/API-Swagger-green)](#api-overview)
+[![Deployed](https://img.shields.io/badge/Deployed-Vercel%20|%20Render-success)](#)
 
 A high-fidelity, enterprise-grade financial dashboard designed for real-time tracking, advanced aggregations, and secure data management. This project is split into a robust **NestJS Backend** and a sleek **Next.js Frontend**.
+
+---
+
+## 🌍 Live Deployment
+
+Experience the full-stack Zorvyn ecosystem in production:
+- 🚀 **[Zorvyn Dashboard (Live)](https://zorvyn-assignment-black.vercel.app)**
+- 📡 **[Zorvyn API Docs (Swagger)](https://zorvynassignment-1z56.onrender.com/api)**
+- 🛠 **Backend Service**: [https://zorvynassignment-1z56.onrender.com](https://zorvynassignment-1z56.onrender.com)
+
+### 🏁 Test Credentials
+You can use the following pre-registered user to test the dashboard immediately:
+- **Email**: `deepak_test@gmail.com`
+- **Password**: `password123`
 
 ---
 
@@ -79,8 +94,10 @@ The backend exposes a RESTful API with the following primary modules:
 - **Dashboard**: `/dashboard/all` (Aggregated metrics, category breakdowns, and trends).
 
 ### Interactive Documentation
-A full interactive API reference is available via Swagger. Once the backend is running, visit:
-👉 `http://localhost:3000/api`
+A full interactive API reference is available via Swagger. Visit the live production documentation:
+👉 **[https://zorvynassignment-1z56.onrender.com/api](https://zorvynassignment-1z56.onrender.com/api)**
+
+*For local development, visit `http://localhost:3000/api`.*
 
 ---
 
