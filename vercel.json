@@ -1,0 +1,14 @@
+{
+  "builds": [
+    {
+      "src": "finance-dashboard-frontend/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "finance-dashboard-frontend/$1"
+    }
+  ]
+}
