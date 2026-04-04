@@ -16,6 +16,7 @@ export default function UsersTable() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [deleteModal, setDeleteModal] = useState<{show: boolean, id: string | null}>({ show: false, id: null });
   const itemsPerPage = 5;
 
   const fetchUsers = async () => {
@@ -46,10 +47,15 @@ export default function UsersTable() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
+    setDeleteModal({ show: true, id });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteModal.id) return;
     try {
-      await api.delete(`/users/${id}`);
+      await api.delete(`/users/${deleteModal.id}`);
       toast.success('User deleted');
+      setDeleteModal({ show: false, id: null });
       fetchUsers();
     } catch (err) {
       console.error(err);
@@ -255,13 +261,45 @@ export default function UsersTable() {
           </div>
         </div>
       )}
-      
       {users.length === 0 && !loading && (
         <div className="py-20 text-center space-y-3">
           <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-300"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 00-3-3.87"></path><path d="M16 3.13a4 4 0 010 7.75"></path></svg>
           </div>
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">No other team members found</p>
+        </div>
+      )}
+      
+      {/* Premium Delete Confirmation Modal */}
+      {deleteModal.show && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300"
+            onClick={() => setDeleteModal({ show: false, id: null })}
+          ></div>
+          <div className="relative bg-white rounded-[2.5rem] shadow-2xl shadow-slate-900/20 border border-white/20 w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="pt-10 pb-8 px-8 text-center">
+              <div className="w-20 h-20 bg-rose-50 rounded-[2rem] flex items-center justify-center mx-auto mb-6 text-rose-500 animate-bounce-subtle">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+              </div>
+              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter mb-2">Delete User?</h3>
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest leading-relaxed">This action is permanent and will remove all access for this member.</p>
+            </div>
+            <div className="flex border-t border-slate-50 p-6 gap-4">
+              <button 
+                onClick={() => setDeleteModal({ show: false, id: null })}
+                className="flex-1 py-4 rounded-2xl bg-slate-50 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:bg-slate-100 transition-all active:scale-95"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={confirmDelete}
+                className="flex-1 py-4 rounded-2xl bg-slate-900 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-slate-900/20 hover:bg-rose-600 transition-all active:scale-95"
+              >
+                Confirm Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
