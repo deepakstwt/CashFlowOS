@@ -121,8 +121,8 @@ export default function UsersTable() {
         </div>
       </div>
 
-      {/* Desktop Table View */}
-      <div className="overflow-x-auto">
+      {/* Adaptive Layout: Table for Desktop, Cards for Mobile */}
+      <div className="hidden md:block overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-50/50">
@@ -158,7 +158,7 @@ export default function UsersTable() {
                        <option value="viewer">Viewer</option>
                      </select>
                      <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6-9 12 15 18 9"></polyline></svg>
                      </div>
                    </div>
                 </td>
@@ -175,6 +175,49 @@ export default function UsersTable() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="block md:hidden divide-y divide-slate-50">
+        {currentItems.map((u) => (
+          <div key={u._id} className="p-6 space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-slate-900 flex items-center justify-center text-white text-xs font-black">
+                  {u.name?.charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <p className="text-sm font-black text-slate-800 tracking-tight uppercase">{u.name}</p>
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{u.email}</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => handleDelete(u._id)}
+                className="p-3 text-rose-500 bg-rose-50 rounded-xl active:scale-95 transition-all"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between gap-4 pt-2">
+               <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">ASSIGN ROLE</span>
+               <div className="relative flex-1 max-w-[140px]">
+                  <select 
+                    value={u.role}
+                    onChange={(e) => handleRoleChange(u._id, e.target.value)}
+                    className="w-full appearance-none bg-slate-50 border border-slate-200 px-4 py-2.5 pr-10 rounded-xl text-[9px] font-black uppercase tracking-widest text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-100 hover:border-indigo-200 transition-all cursor-pointer shadow-sm"
+                  >
+                    <option value="admin">Admin</option>
+                    <option value="analyst">Analyst</option>
+                    <option value="viewer">Viewer</option>
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                  </div>
+               </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Pagination Controls */}
