@@ -1,0 +1,108 @@
+# Zorvyn: Modern Financial Management System
+
+[![Aesthetics](https://img.shields.io/badge/Aesthetics-Premium-blueviolet)](#)
+[![Stack](https://img.shields.io/badge/Stack-Next.js%20|%20NestJS%20|%20MongoDB-blue)](#)
+[![Documentation](https://img.shields.io/badge/API-Swagger-green)](#api-overview)
+
+A high-fidelity, enterprise-grade financial dashboard designed for real-time tracking, advanced aggregations, and secure data management. This project is split into a robust **NestJS Backend** and a sleek **Next.js Frontend**.
+
+---
+
+## 🚀 Quick Start
+
+### 📖 Detailed Documentation
+For in-depth technical details, please refer to the specific module documentation:
+- 🔗 **[Backend System Documentation](file:///Users/deepakprajapati/Desktop/ZorvynAssignment/finance-dashboard-backend/README.md)**
+- 🔗 **[Frontend Application Documentation](file:///Users/deepakprajapati/Desktop/ZorvynAssignment/finance-dashboard-frontend/README.md)**
+
+### 1. Backend Setup
+1. Navigate to the backend directory:
+   ```bash
+   cd finance-dashboard-backend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Configure environment variables in `.env`:
+   ```env
+   MONGODB_URI=your_mongodb_connection_string
+   JWT_SECRET=your_jwt_secret
+   PORT=3000
+   ```
+4. Run the development server:
+   ```bash
+   npm run start:dev
+   ```
+
+### 2. Frontend Setup
+1. Navigate to the frontend directory:
+   ```bash
+   cd finance-dashboard-frontend
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
+4. Access the application at `http://localhost:3001`.
+
+---
+
+## 🛠 Tech Stack
+
+### Backend (NestJS)
+- **Framework**: NestJS (Node.js) for a modular, scalable architecture.
+- **Database**: MongoDB with Mongoose ODM for flexible financial records.
+- **Security**: JWT-based authentication with Passport.js and Role-Based Access Control (RBAC).
+- **Validation**: Strict schema validation using `class-validator`.
+- **API Documentation**: Automated Swagger/OpenAPI documentation.
+
+### Frontend (Next.js)
+- **Framework**: Next.js 15+ (App Router) for high-performance rendering.
+- **Styling**: Tailwind CSS for a minimalist, premium dark-mode aesthetic.
+- **Visuals**: Recharts for dynamic financial data visualization.
+- **State Management**: React Hooks & Axios for efficient API interaction.
+
+---
+
+## 📡 API Overview
+
+The backend exposes a RESTful API with the following primary modules:
+
+### Core Endpoints
+- **Auth**: `/auth/login`, `/auth/register` (JWT-based session management).
+- **Finance**: `/finance` (CRUD operations for transactions, CSV export).
+- **Dashboard**: `/dashboard/all` (Aggregated metrics, category breakdowns, and trends).
+
+### Interactive Documentation
+A full interactive API reference is available via Swagger. Once the backend is running, visit:
+👉 `http://localhost:3000/api`
+
+---
+
+## 🧠 Architectural Assumptions & Tradeoffs
+
+### Assumptions Made
+1. **Shared Organizational Pool**: We assume financial data is shared across the organization rather than strictly siloed by user, though RBAC (Admin/Analyst/Viewer) controls the level of interaction.
+2. **Soft Deletion Protocol**: Transactions are never physically deleted to maintain an audit trail. Instead, an `isDeleted` flag is used.
+3. **Stateless Authentication**: We utilize JWT for authentication to ensure the backend remains stateless and horizontally scalable.
+
+### Tradeoffs Considered
+1. **NestJS vs. Express**: We chose NestJS for its modularity and built-in support for TypeScript/Decorators, which provides a more robust foundation for enterprise apps despite slightly higher initial boilerplate.
+2. **Server-Side Aggregations**: We offload complex calculations (totals, trends) to MongoDB aggregation pipelines. This prioritizes database efficiency and reduces payload sizes, though it requires more complex query logic.
+3. **Tailwind CSS**: Chosen for rapid prototyping and consistent design tokens, allowing for a premium custom-built look without the overhead of heavy component libraries.
+
+---
+
+## 📈 Future Roadmaps
+- [ ] **Advanced Audit Logs**: Dedicated UI for tracking changes to financial records.
+- [ ] **Multi-Currency Support**: Real-time currency conversion for global transactions.
+- [ ] **Advanced Exports**: Supporting PDF report generation and automated email summaries.
+
+---
+
+*This project was built with a focus on visual excellence and technical rigor.*
