@@ -16,12 +16,20 @@ export class RegisterDto {
   @MinLength(6)
   password: string;
 
-  @ApiProperty({ example: 'ZORVYN-88', required: false })
+  @ApiProperty({ 
+    description: 'The unique code provided by an administrator to join an existing organization.',
+    example: 'ZORVYN-88', 
+    required: false 
+  })
   @IsString()
   @IsOptional()
   inviteCode?: string;
 
-  @ApiProperty({ example: 'admin', required: false })
+  @ApiProperty({ 
+    description: 'The role to join as (Analyst or Viewer). Note: ADMIN role cannot be assigned via invite link.',
+    example: 'analyst', 
+    required: false 
+  })
   @IsString()
   @IsOptional()
   role?: string;

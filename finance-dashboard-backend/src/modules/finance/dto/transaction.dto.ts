@@ -70,4 +70,7 @@ export class QueryTransactionDto {
   @IsString()
   @IsOptional()
   export?: string;
+
+  @IsOptional()
+  _cb?: string;
 }

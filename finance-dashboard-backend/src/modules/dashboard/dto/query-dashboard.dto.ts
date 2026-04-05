@@ -16,4 +16,7 @@ export class QueryDashboardDto {
   @IsOptional()
   @IsString()
   range?: string;
+
+  @IsOptional()
+  _cb?: string;
 }

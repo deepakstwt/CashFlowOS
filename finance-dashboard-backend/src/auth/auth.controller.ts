@@ -15,9 +15,10 @@ import { UserRole } from '../users/schemas/user.schema';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @ApiOperation({ summary: 'Register a new user account' })
+  @ApiOperation({ summary: 'Register a new organization (Admin) or join an existing one via Invite Code' })
   @ApiResponse({ status: 201, description: 'User successfully registered' })
   @ApiResponse({ status: 400, description: 'User already exists or invalid data' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Cannot assign Admin role via invite link' })
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);

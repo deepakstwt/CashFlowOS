@@ -1,4 +1,5 @@
-import { Injectable, UnauthorizedException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException, InternalServerErrorException, ForbiddenException } from '@nestjs/common';
+import { Types } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
@@ -20,23 +21,36 @@ export class AuthService {
     
     try {
         const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-        let organizationId = '';
-        let inviteCode = '';
-        let role = registerDto.role || UserRole.VIEWER;
+        let organizationId: Types.ObjectId;
+        let inviteCode: string;
+        let role: UserRole;
 
         if (registerDto.inviteCode) {
+            // SECURITY: Enforcing role assignment strictly from invite context
+            // Blocking any attempt to assign ADMIN role during invite-based signup
+            if (registerDto.role === UserRole.ADMIN) {
+                throw new ForbiddenException('Admin role cannot be assigned via invite link to prevent privilege escalation.');
+            }
+
             const organizer = await this.usersService.findByInviteCode(registerDto.inviteCode);
             if (!organizer) {
                 throw new BadRequestException('Invalid invite code. Please check with your team admin.');
             }
+
+            // Using role from invite link (query param) - Defaulting to VIEWER if not provided
             organizationId = organizer.organizationId;
-            inviteCode = organizer.inviteCode; // Inherit the same invite code for the org
-            role = registerDto.role || UserRole.VIEWER;
+            inviteCode = organizer.inviteCode; // Inherit organization's invite code
+            role = (registerDto.role as UserRole) || UserRole.VIEWER;
         } else {
-            // New Organization - This user is the Admin
-            organizationId = `org_${Math.random().toString(36).substring(2, 11)}`;
+            // COMPLIANCE: Only Admin role can start a new organization
+            if (registerDto.role && registerDto.role !== UserRole.ADMIN) {
+                throw new BadRequestException('Viewer and Analyst roles require a Team Invite Code to join an existing organization.');
+            }
+
+            // New Organization - This user is the Admin/Owner
+            organizationId = new Types.ObjectId();
             inviteCode = `ZORVYN-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-            role = UserRole.ADMIN; // No invite code = Owner/Admin
+            role = UserRole.ADMIN; 
         }
 
         const newUser = await this.usersService.create({
@@ -55,7 +69,7 @@ export class AuthService {
           organizationId: newUser.organizationId
         };
     } catch (error: any) {
-        if (error instanceof BadRequestException) throw error;
+        if (error instanceof BadRequestException || error instanceof ForbiddenException) throw error;
         if (error.name === 'ValidationError' || error.code === 11000) {
             throw new BadRequestException(error.message || 'Validation failed');
         }

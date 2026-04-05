@@ -5,9 +5,11 @@ import Sidebar from '@/components/Sidebar';
 import UsersTable from '@/components/UsersTable';
 import api from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 export default function UsersPage() {
   const [user, setUser] = useState<{name: string, role: string} | null>(null);
+  const [inviteCode, setInviteCode] = useState('');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const router = useRouter();
 
@@ -16,6 +18,7 @@ export default function UsersPage() {
       try {
         const res = await api.get('/auth/profile');
         setUser(res.data);
+        setInviteCode(res.data.inviteCode);
         if (res.data.role.toLowerCase() !== 'admin') {
            router.push('/dashboard');
         }
@@ -72,9 +75,65 @@ export default function UsersPage() {
         </header>
 
         <main className="flex-1 lg:mr-6 lg:mb-6 lg:ml-6 bg-white lg:rounded-[2rem] shadow-2xl shadow-slate-200/40 border border-slate-100 overflow-y-auto">
-          <div className="p-4 md:p-8 space-y-8 md:space-y-10">
-             <div className="max-w-7xl mx-auto py-10">
-               <UsersTable />
+          <div className="p-4 md:p-8 space-y-8 md:space-y-12">
+             <div className="max-w-7xl mx-auto space-y-10">
+               
+               {/* Team Invitation Card (Global) */}
+               <div className="bg-[#f8fafc] border-2 border-dashed border-slate-200 p-8 md:p-10 rounded-[3rem] shadow-sm flex flex-col lg:flex-row items-center justify-between gap-8 hover:border-indigo-200 transition-all group animate-in fade-in slide-in-from-top-4 duration-700">
+                  <div className="space-y-3 text-center lg:text-left max-w-sm">
+                    <h1 className="text-2xl font-black text-slate-900 tracking-tighter uppercase whitespace-nowrap">Grow Your Team</h1>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] leading-relaxed">
+                      Generate role-locked invites for your workspace
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto">
+                        <div className="flex flex-wrap justify-center gap-3">
+                          <button 
+                            onClick={async () => {
+                              try {
+                                const link = `${window.location.origin}/register?code=${inviteCode}&role=analyst`;
+                                await navigator.clipboard.writeText(link);
+                                toast.success('Analyst invite link copied to clipboard!');
+                              } catch (err) {
+                                console.error('Clipboard error:', err);
+                                toast.error('Failed to copy link.');
+                              }
+                            }}
+                            className="px-6 py-3.5 bg-white border border-slate-200 text-slate-900 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:border-indigo-600 hover:text-indigo-600 shadow-sm transition-all active:scale-95 flex items-center gap-2"
+                          >
+                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="17" y1="11" x2="23" y2="11"></line></svg>
+                             Invite Analyst
+                          </button>
+                          <button 
+                            onClick={async () => {
+                              try {
+                                const link = `${window.location.origin}/register?code=${inviteCode}&role=viewer`;
+                                await navigator.clipboard.writeText(link);
+                                toast.success('Viewer invite link copied to clipboard!');
+                              } catch (err) {
+                                console.error('Clipboard error:', err);
+                                toast.error('Failed to copy link.');
+                              }
+                            }}
+                            className="px-6 py-3.5 bg-white border border-slate-200 text-slate-900 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:border-indigo-600 hover:text-indigo-600 shadow-sm transition-all active:scale-95 flex items-center gap-2"
+                          >
+                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><path d="M23 11a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"></path></svg>
+                             Invite Viewer
+                          </button>
+                        </div>
+                  </div>
+               </div>
+
+               <div className="bg-white border border-slate-100 rounded-[2.5rem] p-1 shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+                 <div className="p-8 border-b border-slate-50 flex items-center justify-between">
+                    <h2 className="text-xl font-black text-slate-900 tracking-tighter uppercase whitespace-nowrap">Active Members</h2>
+                    <div className="px-4 py-1.5 bg-slate-50 rounded-full border border-slate-100 text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">
+                      Workspace #{inviteCode}
+                    </div>
+                 </div>
+                 <UsersTable />
+               </div>
              </div>
           </div>
         </main>

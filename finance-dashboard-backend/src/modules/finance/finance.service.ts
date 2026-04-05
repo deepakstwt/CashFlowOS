@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
-import { Parser } from 'json2csv';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Parser } from 'json2csv';
+import mongoose, { Model, Types } from 'mongoose';
 import { Transaction, TransactionDocument } from './schemas/transaction.schema';
 import { CreateTransactionDto, UpdateTransactionDto, QueryTransactionDto } from './dto/transaction.dto';
 import { UserRole } from '../../users/schemas/user.schema';
@@ -31,9 +31,9 @@ export class FinanceService {
 
   async getTransactions(organizationId: string, query: QueryTransactionDto, isExport = false) {
     // COLLABORATIVE DATA MODEL: users see all transactions in their organization.
-    const filter: Record<string, any> = { 
+    const filter: any = { 
       isDeleted: false,
-      organizationId: new Types.ObjectId(organizationId) 
+      organizationId: new Types.ObjectId(organizationId)
     };
 
     if (query.type) {
@@ -45,13 +45,14 @@ export class FinanceService {
     }
 
     if (query.startDate || query.endDate) {
-      filter.date = {};
+      const dateFilter: { $gte?: Date; $lte?: Date } = {};
       if (query.startDate) {
-        filter.date.$gte = new Date(query.startDate);
+        dateFilter.$gte = new Date(query.startDate);
       }
       if (query.endDate) {
-        filter.date.$lte = new Date(query.endDate);
+        dateFilter.$lte = new Date(query.endDate);
       }
+      filter.date = dateFilter;
     }
 
     const page = query.page || 1;
@@ -98,17 +99,21 @@ export class FinanceService {
       throw new NotFoundException('Transaction not found or unauthorized for this organization');
     }
 
-    const updatedTransaction: any = await this.transactionModel
+    const updatedTransaction = await this.transactionModel
       .findByIdAndUpdate(transactionId, dto, { new: true })
       .populate('userId', 'name role')
       .lean()
       .exec();
 
+    if (!updatedTransaction) {
+      throw new NotFoundException('Updated transaction not found');
+    }
+
     // Logging Audit Event with the user who performed the update
     await this.auditLogService.log(AuditAction.UPDATE, transactionId, performedBy, dto);
 
     // Transforming userId to createdBy
-    const { userId, ...rest } = updatedTransaction;
+    const { userId, ...rest } = updatedTransaction as any;
     return {
       ...rest,
       createdBy: userId,
@@ -139,7 +144,7 @@ export class FinanceService {
     const { data } = await this.getTransactions(organizationId, query, true);
     
     const fields = [
-      { label: 'Date', value: (row: any) => new Date(row.date).toLocaleDateString() },
+      { label: 'Date', value: (row: { date: string | number | Date }) => new Date(row.date).toLocaleDateString() },
       { label: 'Type', value: 'type' },
       { label: 'Category', value: 'category' },
       { label: 'Amount', value: 'amount' },

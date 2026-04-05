@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Document, Types, Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Transaction, TransactionDocument } from '../finance/schemas/transaction.schema';
 import { QueryDashboardDto } from './dto/query-dashboard.dto';
 
@@ -13,15 +13,16 @@ export class DashboardService {
   async getSummary(organizationId: string, query: QueryDashboardDto) {
     const { startDate, endDate } = query;
     // COLLABORATIVE DATA MODEL: aggregates all transactions in the organization.
-    const matchStage: Record<string, any> = { 
+    const matchStage: any = { 
       isDeleted: { $ne: true },
       organizationId: new Types.ObjectId(organizationId)
     };
 
     if (startDate || endDate) {
-      matchStage.date = {};
-      if (startDate) matchStage.date.$gte = new Date(startDate);
-      if (endDate) matchStage.date.$lte = new Date(endDate);
+      const dateFilter: { $gte?: Date; $lte?: Date } = {};
+      if (startDate) dateFilter.$gte = new Date(startDate);
+      if (endDate) dateFilter.$lte = new Date(endDate);
+      matchStage.date = dateFilter;
     }
 
     const result = await this.transactionModel.aggregate([
@@ -54,15 +55,16 @@ export class DashboardService {
   async getCategoryBreakdown(organizationId: string, query: QueryDashboardDto) {
     const { startDate, endDate } = query;
     // COLLABORATIVE DATA MODEL: shows all categories in the organization.
-    const matchStage: Record<string, any> = { 
+    const matchStage: any = { 
       isDeleted: { $ne: true },
       organizationId: new Types.ObjectId(organizationId)
     };
 
     if (startDate || endDate) {
-      matchStage.date = {};
-      if (startDate) matchStage.date.$gte = new Date(startDate);
-      if (endDate) matchStage.date.$lte = new Date(endDate);
+      const dateFilter: { $gte?: Date; $lte?: Date } = {};
+      if (startDate) dateFilter.$gte = new Date(startDate);
+      if (endDate) dateFilter.$lte = new Date(endDate);
+      matchStage.date = dateFilter;
     }
 
     const result = await this.transactionModel.aggregate([
@@ -90,15 +92,16 @@ export class DashboardService {
 
   async getMonthlyTrends(organizationId: string, query: QueryDashboardDto) {
     const { startDate, endDate, range = '6M' } = query;
-    const matchStage: Record<string, any> = { 
+    const matchStage: any = { 
       isDeleted: { $ne: true },
       organizationId: new Types.ObjectId(organizationId)
     };
 
     if (startDate || endDate) {
-      matchStage.date = {};
-      if (startDate) matchStage.date.$gte = new Date(startDate);
-      if (endDate) matchStage.date.$lte = new Date(endDate);
+      const dateFilter: { $gte?: Date; $lte?: Date } = {};
+      if (startDate) dateFilter.$gte = new Date(startDate);
+      if (endDate) dateFilter.$lte = new Date(endDate);
+      matchStage.date = dateFilter;
     }
 
     const aggregated = await this.transactionModel.aggregate([
@@ -145,15 +148,16 @@ export class DashboardService {
 
   async getDashboardData(organizationId: string, query: QueryDashboardDto) {
     const { startDate, endDate, range = '6M' } = query;
-    const matchStage: Record<string, any> = { 
+    const matchStage: any = { 
       isDeleted: { $ne: true },
       organizationId: new Types.ObjectId(organizationId)
     };
 
     if (startDate || endDate) {
-      matchStage.date = {};
-      if (startDate) matchStage.date.$gte = new Date(startDate);
-      if (endDate) matchStage.date.$lte = new Date(endDate);
+      const dateFilter: { $gte?: Date; $lte?: Date } = {};
+      if (startDate) dateFilter.$gte = new Date(startDate);
+      if (endDate) dateFilter.$lte = new Date(endDate);
+      matchStage.date = dateFilter;
     }
 
     const result = await this.transactionModel.aggregate([
@@ -216,8 +220,8 @@ export class DashboardService {
     const categories = facetData.categories || [];
 
     // Processing Trends
-    const dataMap = new Map();
-    (facetData.trends || []).forEach((item: Record<string, any>) => {
+    const dataMap = new Map<string, { income: number; expense: number }>();
+    (facetData.trends || []).forEach((item: { _id: { year: number; month: number }; income: number; expense: number }) => {
       const monthStr = `${item._id.year}-${String(item._id.month).padStart(2, '0')}`;
       dataMap.set(monthStr, { income: item.income, expense: item.expense });
     });

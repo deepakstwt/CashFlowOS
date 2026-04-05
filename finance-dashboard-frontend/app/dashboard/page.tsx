@@ -289,27 +289,6 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Team Invitation Card (Visible to Viewer as well, but shows the code they belong to) */}
-                <div className="col-span-1 md:col-span-2 bg-white border border-slate-100 p-8 rounded-[2.5rem] shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 hover:shadow-md transition-all">
-                   <div className="space-y-2 text-center md:text-left">
-                     <h3 className="text-xl font-black text-slate-900 tracking-tighter uppercase whitespace-nowrap">Your Team Workspace</h3>
-                     <p className="text-xs text-slate-400 font-bold uppercase tracking-widest leading-none">Share this code with your team to invite them</p>
-                   </div>
-                   <div className="flex items-center gap-3">
-                      <div className="px-6 py-4 bg-slate-900 rounded-2xl text-white font-black tracking-[0.3em] shadow-lg shadow-slate-200 text-lg">
-                        {inviteCode}
-                      </div>
-                      <button 
-                        onClick={() => {
-                          navigator.clipboard.writeText(inviteCode);
-                          alert('Invitation code copied to clipboard!');
-                        }}
-                        className="p-4 bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-100 transition-all active:scale-90"
-                      >
-                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
-                      </button>
-                   </div>
-                </div>
               </div>
             )}
 

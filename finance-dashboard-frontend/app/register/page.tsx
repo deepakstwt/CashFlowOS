@@ -1,23 +1,66 @@
 "use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
 
-export default function RegisterPage() {
+function RegisterPageContent() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState('viewer');
+  const [role, setRole] = useState('admin');
   const [inviteCode, setInviteCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isCodeLocked, setIsCodeLocked] = useState(false);
+  const [isRoleLocked, setIsRoleLocked] = useState(false);
+  
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const codeFromUrl = searchParams.get('code');
+    const roleFromUrl = searchParams.get('role');
+
+    if (codeFromUrl) {
+      setInviteCode(codeFromUrl);
+      setIsCodeLocked(true);
+      
+      // If code is present, default to viewer unless role is specified
+      if (roleFromUrl && ['viewer', 'analyst'].includes(roleFromUrl.toLowerCase())) {
+        setRole(roleFromUrl.toLowerCase());
+        setIsRoleLocked(true);
+      } else {
+        setRole('viewer');
+      }
+    } else {
+      setRole('admin');
+    }
+  }, [searchParams]);
+
+  // Sync role when inviteCode changes manually
+  useEffect(() => {
+    if (!isRoleLocked) {
+      if (inviteCode && role === 'admin') {
+        setRole('viewer');
+      } else if (!inviteCode && role !== 'admin') {
+        setRole('admin');
+      }
+    }
+  }, [inviteCode, isRoleLocked, role]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // VALIDATION: Non-Admin users MUST provide an invite code.
+    if (role !== 'admin' && !inviteCode) {
+      setError('Viewer and Analyst roles require a Team Invite Code to join an existing organization.');
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError('');
     try {
@@ -28,10 +71,11 @@ export default function RegisterPage() {
       const response = await api.post('/auth/register', data);
       console.log('[Register] Success:', response.data);
       router.push('/login');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('[Register] Error:', err);
-      if (err.response?.data?.message) {
-        const msg = err.response.data.message;
+      const errorData = (err as any).response?.data;
+      if (errorData?.message) {
+        const msg = errorData.message;
         setError(Array.isArray(msg) ? msg[0] : msg);
       } else {
         setError('Failed to register account. Check your connection.');
@@ -142,48 +186,58 @@ export default function RegisterPage() {
                 Team Invite Code 
                 <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">(Optional)</span>
               </label>
-              <div className="mt-2">
+              <div className="mt-2 text-center">
                 <input
                   type="text"
                   value={inviteCode}
+                  disabled={isCodeLocked}
                   onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-                  className="appearance-none block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50/50 focus:bg-white text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all shadow-sm tracking-widest selection:bg-black selection:text-white"
+                  className={`appearance-none block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50/50 focus:bg-white text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all shadow-sm tracking-widest selection:bg-black selection:text-white ${isCodeLocked ? 'opacity-60 cursor-not-allowed bg-gray-100' : ''}`}
                   placeholder="ZORVYN-XXXX"
                 />
               </div>
-              <p className="mt-2 text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Leave blank to start a new organization</p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold tracking-wide text-gray-700 mb-3">
-                Account Role
-              </label>
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  { id: 'viewer', label: 'Viewer' },
-                  { id: 'analyst', label: 'Analyst' },
-                  { id: 'admin', label: 'Admin' }
-                ].map((r) => (
-                  <div
-                    key={r.id}
-                    onClick={() => setRole(r.id)}
-                    className={`relative flex flex-col items-center justify-center p-4 rounded-xl border text-center cursor-pointer transition-all duration-200 ${
-                      role === r.id
-                        ? 'border-black bg-gray-900/5 ring-1 ring-black shadow-sm'
-                        : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    <div className={`text-sm font-bold ${role === r.id ? 'text-gray-900' : 'text-gray-700'}`}>
-                      {r.label}
-                    </div>
-                    {role === r.id && (
-                       <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-black rounded-full text-white flex items-center justify-center">
-                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                       </div>
-                    )}
+              <p className="mt-2 text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">
+                {isCodeLocked ? 'Locked for your invitation' : 'Leave blank to start a new organization'}
+              </p>
+              {inviteCode && (
+                <div className="animate-in fade-in slide-in-from-top-2 duration-500 mt-4">
+                  <label className="block text-sm font-bold tracking-wide text-gray-700 mb-3 group flex items-center gap-2">
+                    Assign Account Role
+                    {isRoleLocked && <span className="text-[10px] font-black text-indigo-500 uppercase tracking-tighter">(Assigned by Admin)</span>}
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { id: 'viewer', label: 'Viewer' },
+                      { id: 'analyst', label: 'Analyst' }
+                    ].map((r) => (
+                      <div
+                        key={r.id}
+                        onClick={() => !isRoleLocked && setRole(r.id)}
+                        className={`relative flex flex-col items-center justify-center p-4 rounded-xl border text-center transition-all duration-200 ${
+                          isRoleLocked && role !== r.id ? 'opacity-40 grayscale cursor-not-allowed' : 'cursor-pointer'
+                        } ${
+                          role === r.id
+                            ? 'border-indigo-600 bg-indigo-50/30 ring-1 ring-indigo-600 shadow-sm'
+                            : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className={`text-sm font-bold ${role === r.id ? 'text-indigo-900' : 'text-gray-700'}`}>
+                          {r.label}
+                        </div>
+                        {role === r.id && (
+                          <div className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-indigo-600 rounded-full text-white flex items-center justify-center">
+                            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                  <p className="mt-3 text-[10px] text-gray-500 font-medium italic flex items-center gap-1.5 px-1 opacity-80">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-500"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    Role assignment is strictly managed by your organization's administrator.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="pt-3">
@@ -210,5 +264,17 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="w-12 h-12 border-4 border-slate-200 border-t-black rounded-full animate-spin"></div>
+      </div>
+    }>
+      <RegisterPageContent />
+    </Suspense>
   );
 }

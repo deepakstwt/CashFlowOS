@@ -101,6 +101,28 @@ A full interactive API reference is available via Swagger. Visit the live produc
 
 ---
 
+## 👥 Invite-Based Onboarding & RBAC
+
+Zorvyn utilizes a secure, organization-centric onboarding flow governed by Role-Based Access Control (RBAC).
+
+### **1. The Lifecycle**
+1. **Organization Creation**: An Admin registers *without* an invite code. The system automatically creates a new `organizationId` and a unique `inviteCode` for their workspace.
+2. **Team Invitation**: The Admin generates role-specific invite links (Analyst or Viewer) and shares them with their team.
+   - Example Link: `/register?code=XXXX&role=viewer`
+3. **User Onboarding**: New users register via the invite link. The system validates the code, inherits the `organizationId`, and assigns the pre-defined role.
+
+### **2. Security Posture**
+- **Backend-Enforced Roles**: Role assignment is controlled strictly by the backend. Even if a user attempts to manually select "Admin" during an invite-based signup, the system will block the request to prevent privilege escalation.
+- **Role Restrictions**:
+  - **Viewer**: Read-only access to the dashboard and ledger.
+  - **Analyst**: Access to view and create new financial records.
+  - **Admin**: Full control over records (CRUD) and team management.
+
+### **3. Data Model**
+- **Organization-Wide Sharing**: All data (transactions, summaries, trends) is shared across the entire organization. Every user sees the same dashboard metrics; roles simply define which actions (e.g., Redaction, Editing) are available.
+
+---
+
 ## 🧠 Architectural Assumptions & Tradeoffs
 
 ### Assumptions Made

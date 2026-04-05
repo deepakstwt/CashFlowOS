@@ -8,6 +8,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { Roles } from '../../auth/decorators/roles.decorator';
 import { UserRole } from '../../users/schemas/user.schema';
+import type { AuthenticatedUser } from '../../auth/interfaces/user.interface';
 
 @ApiTags('Finance Records')
 @ApiBearerAuth()
@@ -16,18 +17,17 @@ import { UserRole } from '../../users/schemas/user.schema';
 export class FinanceController {
   constructor(private readonly financeService: FinanceService) {}
 
-  @ApiOperation({ summary: 'Create a new financial record (Admin Only)' })
+  @ApiOperation({ summary: 'Create a new financial record (Admin and Analyst Only)' })
   @ApiResponse({ status: 201, description: 'Record successfully created' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Requires Admin' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Requires Admin or Analyst role' })
   @Post()
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
-  async createTransaction(@CurrentUser() user: any, @Body() dto: CreateTransactionDto) {
-    const userId = user.userId || user.id;
-    return this.financeService.createTransaction(userId, user.organizationId, dto);
+  @Roles(UserRole.ADMIN, UserRole.ANALYST)
+  async createTransaction(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateTransactionDto) {
+    return this.financeService.createTransaction(user.userId, user.organizationId, dto);
   }
 
-  @ApiOperation({ summary: 'Get records or export to CSV (Admin/Analyst Only)' })
+  @ApiOperation({ summary: 'Get records or export to CSV (Admin/Analyst/Viewer)' })
   @ApiQuery({ name: 'export', required: false, type: Boolean })
   @ApiResponse({ status: 200, description: 'Returns records or a CSV file' })
   @Get()
@@ -36,7 +36,7 @@ export class FinanceController {
   async getTransactions(
     @Query() query: QueryTransactionDto,
     @Query('export') exportFlag: string,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Res() res: Express.Response,
   ) {
     if (exportFlag === 'true') {
@@ -58,12 +58,11 @@ export class FinanceController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
   async updateTransaction(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Param('id') id: string,
     @Body() dto: UpdateTransactionDto,
   ) {
-    const userId = user.userId || user.id;
-    return this.financeService.updateTransaction(id, dto, user.organizationId, userId);
+    return this.financeService.updateTransaction(id, dto, user.organizationId, user.userId);
   }
 
   @ApiOperation({ summary: 'Soft delete a record (Admin Only)' })
@@ -72,8 +71,7 @@ export class FinanceController {
   @Delete(':id')
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
-  async deleteTransaction(@CurrentUser() user: any, @Param('id') id: string) {
-    const userId = user.userId || user.id;
-    return this.financeService.deleteTransaction(id, user.organizationId, userId);
+  async deleteTransaction(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
+    return this.financeService.deleteTransaction(id, user.organizationId, user.userId);
   }
 }
