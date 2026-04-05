@@ -16,6 +16,11 @@ export class RegisterDto {
   @MinLength(6)
   password: string;
 
+  @ApiProperty({ example: 'ZORVYN-88', required: false })
+  @IsString()
+  @IsOptional()
+  inviteCode?: string;
+
   @ApiProperty({ example: 'admin', required: false })
   @IsString()
   @IsOptional()

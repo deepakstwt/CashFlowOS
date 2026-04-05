@@ -11,6 +11,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState('viewer');
+  const [inviteCode, setInviteCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -21,7 +22,7 @@ export default function RegisterPage() {
     setError('');
     try {
       // Ensure role is exactly what the backend enum expects (already is)
-      const data = { name, email, password, role };
+      const data = { name, email, password, role, inviteCode };
       console.log('[Register] Sending data:', data);
       
       const response = await api.post('/auth/register', data);
@@ -134,6 +135,23 @@ export default function RegisterPage() {
                   )}
                 </button>
               </div>
+            </div>
+
+            <div className="animate-in fade-in slide-in-from-top-2 duration-500 delay-200">
+              <label className="block text-sm font-bold tracking-wide text-gray-700 group flex items-center gap-2">
+                Team Invite Code 
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">(Optional)</span>
+              </label>
+              <div className="mt-2">
+                <input
+                  type="text"
+                  value={inviteCode}
+                  onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                  className="appearance-none block w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50/50 focus:bg-white text-gray-900 font-medium placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent transition-all shadow-sm tracking-widest selection:bg-black selection:text-white"
+                  placeholder="ZORVYN-XXXX"
+                />
+              </div>
+              <p className="mt-2 text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">Leave blank to start a new organization</p>
             </div>
 
             <div>

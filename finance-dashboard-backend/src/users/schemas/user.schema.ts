@@ -29,8 +29,11 @@ export class User {
   @Prop({ type: String, default: 'Zorvyn Financial' })
   organizationName: string;
 
-  @Prop({ type: String, default: '69d13d90b1157372c5c51395' }) // Global Org ID fallback
+  @Prop({ type: String, required: true })
   organizationId: string;
+
+  @Prop({ type: String, required: true, index: true })
+  inviteCode: string;
   
   // createdAt is automatically managed by timestamps: true, but we type it
   createdAt?: Date;
