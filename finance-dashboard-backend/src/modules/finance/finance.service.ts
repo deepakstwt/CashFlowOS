@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Parser } from 'json2csv';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Transaction, TransactionDocument } from './schemas/transaction.schema';
 import { CreateTransactionDto, UpdateTransactionDto, QueryTransactionDto } from './dto/transaction.dto';
 import { UserRole } from '../../users/schemas/user.schema';
@@ -87,7 +87,7 @@ export class FinanceService {
     };
   }
 
-  async updateTransaction(transactionId: string, dto: UpdateTransactionDto, organizationId: string) {
+  async updateTransaction(transactionId: string, dto: UpdateTransactionDto, organizationId: string, performedBy: string) {
     const transaction = await this.transactionModel.findOne({
       _id: transactionId,
       organizationId: new Types.ObjectId(organizationId),
@@ -115,7 +115,7 @@ export class FinanceService {
     };
   }
 
-  async deleteTransaction(transactionId: string, organizationId: string) {
+  async deleteTransaction(transactionId: string, organizationId: string, performedBy: string) {
     const transaction = await this.transactionModel.findOne({
       _id: transactionId,
       organizationId: new Types.ObjectId(organizationId),

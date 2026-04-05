@@ -62,7 +62,8 @@ export class FinanceController {
     @Param('id') id: string,
     @Body() dto: UpdateTransactionDto,
   ) {
-    return this.financeService.updateTransaction(id, dto, user.organizationId);
+    const userId = user.userId || user.id;
+    return this.financeService.updateTransaction(id, dto, user.organizationId, userId);
   }
 
   @ApiOperation({ summary: 'Soft delete a record (Admin Only)' })
@@ -72,6 +73,7 @@ export class FinanceController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN)
   async deleteTransaction(@CurrentUser() user: any, @Param('id') id: string) {
-    return this.financeService.deleteTransaction(id, user.organizationId);
+    const userId = user.userId || user.id;
+    return this.financeService.deleteTransaction(id, user.organizationId, userId);
   }
 }
