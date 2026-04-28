@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import api from '@/lib/api';
@@ -11,7 +11,27 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [checkingSession, setCheckingSession] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const token = localStorage.getItem('access_token');
+      if (token) {
+        try {
+          // Verify token is still valid
+          await api.get('/auth/profile');
+          router.push('/dashboard');
+          return; // Don't stop loading if redirecting
+        } catch (err) {
+          // Token invalid, clear it
+          localStorage.removeItem('access_token');
+        }
+      }
+      setCheckingSession(false);
+    };
+    checkSession();
+  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,6 +50,17 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  if (checkingSession) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 space-y-4 font-sans">
+        <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center shadow-md">
+           <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+        </div>
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Verifying Session...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#fafafa] font-sans text-gray-900 flex flex-col justify-center py-12 sm:px-6 lg:px-8 relative selection:bg-gray-200">
